@@ -63,7 +63,12 @@ UIGen is an AI-powered React component generator. Users describe components in a
 
 ### Data Persistence
 
-Authenticated users' projects (messages + virtual FS snapshot) are stored in SQLite via Prisma. The schema has two models: `User` and `Project`. The `data` column holds `JSON.stringify(fileSystem.serialize())` and `messages` holds the full conversation.
+Authenticated users' projects (messages + virtual FS snapshot) are stored in SQLite via Prisma. The database schema is defined in `prisma/schema.prisma` — reference it anytime you need to understand the structure of data stored in the database. The schema has two models:
+
+- **`User`** — `id` (cuid), `email` (unique), `password`, `createdAt`, `updatedAt`, and a one-to-many relation to `projects`.
+- **`Project`** — `id` (cuid), `name`, `userId` (optional FK to User), `messages` (JSON string, defaults to `[]`), `data` (JSON string, defaults to `{}`), `createdAt`, `updatedAt`. Projects are cascade-deleted when their parent User is deleted.
+
+The `data` column holds `JSON.stringify(fileSystem.serialize())` and `messages` holds the full conversation.
 
 Anonymous users can generate components but nothing is persisted to the DB; work is tracked client-side in `src/lib/anon-work-tracker.ts`.
 
@@ -74,3 +79,7 @@ JWT tokens are issued on sign-up/sign-in and stored in an `httpOnly` cookie name
 ### Testing
 
 Tests use Vitest with jsdom and React Testing Library. Test files live adjacent to the code they test in `__tests__` subdirectories.
+
+### Code Style
+
+Use comments to make lines of code more understandable.
